@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+.pytest_cache
+*.db
+.env
+data/
+nodes/
+data_tmp/
+.vscode/
+.devcontainer
+*.db.*
+data2/
+nodes2/
+references/

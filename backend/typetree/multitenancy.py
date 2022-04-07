@@ -40,70 +40,74 @@ async def create_tenant_directories(tenant: str):
         os.makedirs(dir)
 
 async def create_sub_wallet(tenant: str):
-    if settings.acapy_api:
-        dbname = get_db_name_ssi(tenant=tenant)
-        # we use separate dbs to not get access problems
-        # yes, we should use proper DB in the future :-)
-        with shelve.open(dbname) as db:
-            # some structures init
-            if not 'connections' in db:
-                db['connections'] = {}
-            if not 'connections_nonce_sent' in db:
-                db['connections_nonce_sent'] = {}
+    if not settings.acapy_api:
+        print('ACAPY_API not given, not creating sub-wallets')
+        return
 
-            if not 'wallet_id' in db:
-                # try to create a new wallet
-                db['wallet_name'] = str(uuid4())
-                db['wallet_key'] = str(uuid4())
+    dbname = get_db_name_ssi(tenant=tenant)
+    # we use separate dbs to not get access problems
+    # yes, we should use proper DB in the future :-)
+    with shelve.open(dbname) as db:
+        # some structures init
+        if not 'connections' in db:
+            db['connections'] = {}
+        if not 'connections_nonce_sent' in db:
+            db['connections_nonce_sent'] = {}
 
-                input = {
-                    "wallet_name": db['wallet_name'],
-                    "wallet_key": db['wallet_key'],
-                    "wallet_type": "indy"
+        if not 'wallet_id' in db:
+            # try to create a new wallet
+            db['wallet_name'] = str(uuid4())
+            db['wallet_key'] = str(uuid4())
+
+            input = {
+                "wallet_name": db['wallet_name'],
+                "wallet_key": db['wallet_key'],
+                "wallet_type": "indy"
+            }
+            # since we are running behind uvicorn or nginx or all inside docker, it can NOT be deteced
+            # automatically and needs to be set in env vars
+            webhook_url = get_webhook_base_url(tenant=tenant) + '/agent/webhook'
+            input['wallet_webhook_urls'] = [
+                webhook_url
+            ]
+            r = requests.post(settings.acapy_api + '/multitenancy/wallet', json=input)
+            j = r.json()
+            db['wallet_token'] = j['token']
+            db['wallet_id'] = j['wallet_id']
+
+            print('wallet_token: ' + j['token'])
+
+        header = prepare_headers_from_token(token=db['wallet_token'])
+
+        if ('wallet_id' in db) and (not 'did' in db):
+            # try to create a new did
+            input = {
+                "method": "sov",
+                "options": {
+                    "key_type": "ed25519"
                 }
-                # since we are running behind uvicorn or nginx or all inside docker, it can NOT be deteced
-                # automatically and needs to be set in env vars
-                webhook_url = get_webhook_base_url(tenant=tenant) + '/agent/webhook'
-                input['wallet_webhook_urls'] = [
-                    webhook_url
-                ]
-                r = requests.post(settings.acapy_api + '/multitenancy/wallet', json=input)
-                j = r.json()
-                db['wallet_token'] = j['token']
-                db['wallet_id'] = j['wallet_id']
+            }
+            r = requests.post(settings.acapy_api + '/wallet/did/create', json=input, headers=header)
+            j = r.json()
+            db['did'] = j['result']['did']
+            db['verkey'] = j['result']['verkey']
+        if ('did' in db) and ('did_register_nym' not in db):
+            params = {
+                "did": db['did'],
+                "verkey": db['verkey']
+            }
+            j = requests.post(settings.acapy_api + '/ledger/register-nym', params=params).json() # this execution is on the base wallet - don't set headers!
+            if j['success'] == True:
+                db['did_register_nym'] = True
 
-                print('wallet_token: ' + j['token'])
+        if ('did_register_nym' in db) and ('did_published' not in db):
+            params = {
+                "did": db['did']
+            }
+            j = requests.post(settings.acapy_api + '/wallet/did/public', params=params, headers=header).json()
+            if j['result']['posture'] in ['posted', 'public']:
+                db['did_published'] = True
 
-            header = prepare_headers_from_token(token=db['wallet_token'])
-
-            if ('wallet_id' in db) and (not 'did' in db):
-                # try to create a new did
-                input = {
-                    "method": "sov",
-                    "options": {
-                        "key_type": "ed25519"
-                    }
-                }
-                r = requests.post(settings.acapy_api + '/wallet/did/create', json=input, headers=header)
-                j = r.json()
-                db['did'] = j['result']['did']
-                db['verkey'] = j['result']['verkey']
-            if ('did' in db) and ('did_register_nym' not in db):
-                params = {
-                    "did": db['did'],
-                    "verkey": db['verkey']
-                }
-                j = requests.post(settings.acapy_api + '/ledger/register-nym', params=params).json() # this execution is on the base wallet - don't set headers!
-                if j['success'] == True:
-                    db['did_register_nym'] = True
-
-            if ('did_register_nym' in db) and ('did_published' not in db):
-                params = {
-                    "did": db['did']
-                }
-                j = requests.post(settings.acapy_api + '/wallet/did/public', params=params, headers=header).json()
-                if j['result']['posture'] in ['posted', 'public']:
-                    db['did_published'] = True
 
 
 @router.post('/tenant')

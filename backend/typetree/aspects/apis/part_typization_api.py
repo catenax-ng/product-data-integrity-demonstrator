@@ -22,7 +22,7 @@ from typetree.aspects.models.extra_models import TokenModel  # noqa: F401
 from typetree.aspects.models.error_response import ErrorResponse
 from typetree.aspects.models.part_typization import PartTypization
 
-from typetree.dependencies import DB_NAME_UUID_HEAD
+from typetree.dependencies import get_db_name_uuid_heads
 from typetree.typetree_helper import *
 from typetree.aspects.models.urn_bamm_com_catena_x010_context import UrnBammComCatenaX010Context
 
@@ -49,7 +49,8 @@ async def get_part_typization(
 ) -> PartTypization:
 
     result: PartTypization = None
-    with shelve.open(DB_NAME_UUID_HEAD, 'r') as db:
+    dbname = get_db_name_uuid_heads(tenant=tenant)
+    with shelve.open(dbname, 'r') as db:
         node_id = db[twinId]
         result = PartTypization.parse_obj(get_type_data_from_node_url(node_id, tenant=tenant)['type_data'])
         result.context = UrnBammComCatenaX010Context.as_planned

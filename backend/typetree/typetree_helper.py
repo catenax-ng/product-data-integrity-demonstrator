@@ -7,9 +7,9 @@
 import json
 import requests
 from supplytree.supplytreee_helper import get_data_with_type_from_node, parse_data_from_url, parse_node_from_url
-from .dependencies import ITEMTYPE_TYPE
+from .dependencies import ITEMTYPE_TYPE, get_typetree_base_url
 from .models import ItemType
-from .dependencies import DT_TWIN_REGISTRY, TYPETREE_BASE_URL
+from .dependencies import DT_TWIN_REGISTRY
 from digital_twin_registry.models.aspect_create import AspectCreate
 from digital_twin_registry.models.digital_twin_create import DigitalTwinCreate, DigitalTwinCreateList
 from digital_twin_registry.models.digital_twin import DigitalTwin
@@ -53,8 +53,9 @@ def get_type_data_from_node_url(node_url: str, tenant: str, fetch_child_type_dat
 def register_type_twin(node_id: str, tenant: str) -> DigitalTwin:
     type_data = ItemType.parse_obj(get_type_data_from_node_url(node_id, tenant=tenant)['type_data'])
     id = type_data.catena_x_unique_id
-    part_aspect_url = TYPETREE_BASE_URL + "/parttypetwin/" + id
-    relationship_aspect_url = TYPETREE_BASE_URL + "/relationship/" + id
+    base_url = get_typetree_base_url(tenant=tenant)
+    part_aspect_url = base_url + "/parttypetwin/" + id
+    relationship_aspect_url = base_url + "/relationship/" + id
 
     twin_create = DigitalTwinCreate(id=id, description="", manufacturer="XYZ",
     local_identifiers=[

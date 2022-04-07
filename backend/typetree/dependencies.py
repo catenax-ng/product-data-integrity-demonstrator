@@ -13,6 +13,7 @@ from functools import lru_cache
 class Settings(BaseSettings):
     acapy_api: str = ''
     dt_twin_registry: str = ''
+    typetree_base_url: str = 'http://localhost:8000'
     acapy_webhook_base_url: str = ''
     organization_name: str = 'Organization Name'
     primary_color: str = '#1976D2'
@@ -32,11 +33,10 @@ ITEMTYPE_TYPE = os.getenv('ITEMTYPE_TYPE', 'http://supplytree.org/ns/ItemType')
 CO2_TYPE = os.getenv('CO2_TYPE', 'http://supplytree.org/ns/CO2')
 DB_NAME = os.getenv("DB_NAME", "database.db")
 DB_NAME_REMOTE_TYPES = os.getenv("DB_NAME_REMOTE_TYPES", "database_remote_types.db")
-DB_NAME_UUID_HEAD = os.getenv('DB_NAME_UUID_HEAD', "uuid_heads.db")
 # DB_TYPE_NAME_HEAD = os.getenv('DB_TYPE_NAME_HEAD', "db_type_name_head.db")
 SUPPLYTREE_API = os.getenv("SUPLYTREE_API", "http://localhost:3000")
 
-TYPETREE_BASE_URL = os.getenv('TYPETREE_BASE_URL', "http://localhost:8000")
+TYPETREE_BASE_URL = settings.typetree_base_url
 DT_TWIN_REGISTRY = settings.dt_twin_registry
 
 ACAPY_API = settings.acapy_api

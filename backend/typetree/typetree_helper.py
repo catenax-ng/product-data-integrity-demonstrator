@@ -9,7 +9,7 @@ import requests
 from supplytree.supplytreee_helper import get_data_with_type_from_node, parse_data_from_url, parse_node_from_url
 from .dependencies import ITEMTYPE_TYPE
 from .models import ItemType
-from .dependencies import DT_TWIN_REGISTRY, TYPETREE_BASE_URL, DT_TWIN_LOCAL_IDENTIFIER_INCLUDE_TYPE
+from .dependencies import DT_TWIN_REGISTRY, TYPETREE_BASE_URL
 from digital_twin_registry.models.aspect_create import AspectCreate
 from digital_twin_registry.models.digital_twin_create import DigitalTwinCreate, DigitalTwinCreateList
 from digital_twin_registry.models.digital_twin import DigitalTwin
@@ -73,13 +73,8 @@ def register_type_twin(node_id: str, tenant: str) -> DigitalTwin:
     twin_list = DigitalTwinCreateList(__root__=[
         twin_create
     ])
-    data = None
-    # depends on which version of the registry we use
-    # the unchaned does not support "type" field in local_identifiers
-    if DT_TWIN_LOCAL_IDENTIFIER_INCLUDE_TYPE:
-        data = twin_create.dict(by_alias=True)
-    else:
-        data = twin_create.dict(exclude={'local_identifiers': {'__all__': {'type'} }}, by_alias=True)
+
+    data = twin_create.dict(by_alias=True)
 
     myj = [data]
     print(myj)

@@ -12,6 +12,7 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     acapy_api: str = ''
+    dt_twin_registry: str = ''
     acapy_webhook_base_url: str = ''
     organization_name: str = 'Organization Name'
     primary_color: str = '#1976D2'
@@ -36,8 +37,7 @@ DB_NAME_UUID_HEAD = os.getenv('DB_NAME_UUID_HEAD', "uuid_heads.db")
 SUPPLYTREE_API = os.getenv("SUPLYTREE_API", "http://localhost:3000")
 
 TYPETREE_BASE_URL = os.getenv('TYPETREE_BASE_URL', "http://localhost:8000")
-DT_TWIN_REGISTRY = os.getenv('DT_TWIN_REGISTRY', '')
-DT_TWIN_LOCAL_IDENTIFIER_INCLUDE_TYPE = (os.getenv('DT_TWIN_LOCAL_IDENTIFIER_INCLUDE_TYPE', 'False') == 'True')
+DT_TWIN_REGISTRY = settings.dt_twin_registry
 
 ACAPY_API = settings.acapy_api
 

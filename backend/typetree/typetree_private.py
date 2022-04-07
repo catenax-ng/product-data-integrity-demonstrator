@@ -128,7 +128,6 @@ async def upsert(item_type: ItemType, tenant: str, previous: str = '', co2: Co2D
         item_type.created_on = str(today)
         id = str(uuid4())
         item_type.catena_x_unique_id = id
-        # TODO: register unique identifier on a registry and discovery service
     
     item_type.modified_on = str(date.today())
     # fill duplicate elements
@@ -161,6 +160,14 @@ async def upsert(item_type: ItemType, tenant: str, previous: str = '', co2: Co2D
 
 
     node_r = await post_node(node=node, tenant=tenant)
+
+    if DT_TWIN_REGISTRY and not previous:
+        # create a new twin in the registry
+        try:
+            register_type_twin(node_id=str(node_r.id), tenant=tenant)
+        except Exception as ex:
+            print('could not register twin. Exception: ' + ex)
+
 
     return node_r
 

@@ -23,6 +23,5 @@ class LocalIdentifier(MyBaseModel):
 
     key: str
     value: str
-    type: Optional[str]
 
 LocalIdentifier.update_forward_refs()

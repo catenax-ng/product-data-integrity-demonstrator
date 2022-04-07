@@ -28,7 +28,6 @@ class LocalIdentifierCreate(MyBaseModel):
 
     key: str
     value: str
-    type: Optional[str]
 
     @validator("key")
     def key_min_length(cls, value):

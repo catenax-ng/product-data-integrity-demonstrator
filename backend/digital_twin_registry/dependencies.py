@@ -7,4 +7,5 @@
 from pydantic import BaseModel
 
 class MyBaseModel(BaseModel):
-  allow_population_by_field_name = True
+    class Config:
+        allow_population_by_field_name = True

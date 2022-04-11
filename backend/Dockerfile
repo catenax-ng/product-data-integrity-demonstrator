@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 COPY ./ /code/
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80", "--workers", "5"]
+#CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80", "--workers", "5"]
+CMD ["python", "./main.py"]
 
 # If running behind a proxy like Nginx or Traefik add --proxy-headers

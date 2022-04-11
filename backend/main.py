@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from supplytree.supplytree_private import router as supplytree_private_router
@@ -38,5 +39,7 @@ app.include_router(assembly_part_relationship_router)
 
 if __name__ == '__main__':
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, workers=5, reload=False)
+    port = os.getenv('PORT', '80')
+    workers = os.getenv('WORKERS', '5')
+    uvicorn.run("main:app", host="0.0.0.0", port=int(port), workers=int(workers), reload=False)
 

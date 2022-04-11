@@ -9,8 +9,6 @@ services:
 
   typetree-backend:
     build: ./backend
-    env_file:
-      - .env
     networks:
       - cx
     environment:
@@ -20,6 +18,11 @@ services:
       # - SERVER_BASE_URL AND
       # - API_PREFIX
       - PORT=8000
+      - SERVER_BASE_URL=${SERVER_BASE_URL}
+      - DT_TWIN_REGISTRY=${DT_TWIN_REGISTRY}
+      - ACAPY_API=${ACAPY_API}
+      - ACAPY_WEBHOOK_BASE_URL=${ACAPY_WEBHOOK_BASE_URL}
+
     ports:
       - 127.0.0.1:${BACKEND_PORT-8000}:8000
 

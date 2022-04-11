@@ -22,6 +22,10 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+deployment:
+  env:
+    - API_PREFIX: http://data-integrity-backend.demo.catena-x.net
+
 service:
   type: ClusterIP
   port: 80

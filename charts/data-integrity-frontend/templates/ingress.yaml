@@ -57,5 +57,13 @@ spec:
               servicePort: {{ $svcPort }}
               {{- end }}
           {{- end }}
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: product-data-integrity-demonstrator-data-integrity-backend
+                port:
+                  number: 80
+
     {{- end }}
 {{- end }}

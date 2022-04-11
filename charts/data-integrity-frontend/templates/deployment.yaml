@@ -36,6 +36,11 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          env: #https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+          {{- range $key, $val := .Values.env }}
+          - name: {{ $key }}
+            value: {{ $val }}
+          {{- end }}
           livenessProbe:
             httpGet:
               path: /

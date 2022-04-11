@@ -1,0 +1,49 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ main, prepare-initial-release ]
+#  pull_request:
+#    branches: [ main ]
+
+jobs:
+
+  build-and-push-image:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      name: Build the Docker image
+#      run: docker build ./backend --file Dockerfile --tag data-integrity-backend:$(date +%s)
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        #images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        images: ghcr.io/${{ env.IMAGE_NAME }}
+
+    - name: Build and push Backend
+      uses: docker/build-push-action@v2
+      with:
+        context: ./backend
+        push: true
+        #tags: ${{ steps.meta.outputs.tags }}
+        tags: ghcr.io/catenax-ng/product-data-integrity-demonstrator-backend:latest
+        labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Build and push Frontend
+      uses: docker/build-push-action@v2
+      with:
+        context: ./frontend
+        push: true
+        tags: ghcr.io/catenax-ng/product-data-integrity-demonstrator-frontend:latest
+        labels: ${{ steps.meta.outputs.labels }}

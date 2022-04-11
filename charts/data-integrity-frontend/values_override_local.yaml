@@ -1,0 +1,10 @@
+# use with
+# helm install -f values.yaml -f values_override_local.yaml  ./data-integrity-frontend
+
+ingress:
+  hosts:
+    - host: data-integrity.test
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+

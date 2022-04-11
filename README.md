@@ -24,6 +24,33 @@ Such an additional measure / effort is demonstrated in the following sections. I
 
 - 3rd party attestations (in the form of Verifiable Credentials): Nothing is worth more than an independent trusted 3rd party attestation on a "claim" someone makes (someone that you might not even know  - and definitely not trust - in such a data eco system). This is necessary to trust the data you receive. Technically, the very same thing that powers "Gaia X Labels" and "Self-Descriptions".
 
+# Disclaimer
+> The purpose of this repository is to showcase or demonstrate what data integrity is about. It is NOT meant to be used in any production like environment! We strongly recommend NOT to run this in a public network without additional security measures!
+
+# Build instructions
+```
+DOCKER_BUILDKIT=0 docker-compose build
+```
+For the `acapy` service we need subdir-support (for the meantime while we are using a custom build of acapy) which is not yet possible in docker buildkit (or better: depends on your docker version or more precise, your buildkit version). Therefore we need to disable to get the fallback "old" build command.
+
+The following error is an indication that you should disable buildkit:
+```
+failed to solve: rpc error: code = Unknown desc = failed to solve with frontend dockerfile.v0: failed to read dockerfile: failed to load cache key: subdir not supported yet
+```
+
+After a successful build:
+```
+docker-compose up
+```
+
+## Network considerations
+If running locally with non-public hostnames, e.g. localhost, please use the same PORT for the backend inside and outside the container.
+Also add a mapping to `/etc/hosts`
+```
+127.0.0.1       typetree-backend
+```
+
+
 # SupplyTree
 This project implements the SupplyTree tamper evidence protocol described in detail here:
 https://assets.bosch.com/media/global/research/eot/bosch-eot-paper-supplytree.pdf
